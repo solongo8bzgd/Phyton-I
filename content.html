@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Speaking Practice for Mongolian Students</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .speaking-indicator {
+            position: relative;
+            height: 10px;
+            background-color: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .speaking-progress {
+            position: absolute;
+            height: 100%;
+            background-color: #3b82f6;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .hidden {
+            display: none;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header with Language Toggle -->
+    <header class="bg-blue-600 text-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">IELTS Speaking Practice</h1>
+            <div class="flex items-center space-x-4">
+                <button id="langToggle" class="bg-white text-blue-600 px-4 py-1 rounded-full font-medium hover:bg-blue-50 transition">
+                    <span class="en-lang">Монгол</span>
+                    <span class="mn-lang hidden">English</span>
+                </button>
+                <button id="loginBtn" class="bg-blue-700 px-4 py-1 rounded-full font-medium hover:bg-blue-800 transition">
+                    <i class="fas fa-user mr-2"></i>
+                    <span class="en-lang">Login</span>
+                    <span class="mn-lang hidden">Нэвтрэх</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-96">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold en-lang">Register</h3>
+                <h3 class="text-xl font-bold mn-lang hidden">Бүртгүүлэх</h3>
+                <button id="closeRegisterModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2 en-lang">Name</label>
+                <label class="block text-gray-700 mb-2 mn-lang hidden">Нэр</label>
+                <input type="text" id="registerName" class="w-full px-3 py-2 border rounded">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2 en-lang">Email</label>
+                <label class="block text-gray-700 mb-2 mn-lang hidden">Имэйл</label>
+                <input type="email" id="registerEmail" class="w-full px-3 py-2 border rounded">
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-gray-700 mb-2 en-lang">Password</label>
+                <label class="block text-gray-700 mb-2 mn-lang hidden">Нууц үг</label>
+                <div class="relative">
+                    <input type="password" id="registerPassword" class="w-full px-3 py-2 border rounded">
+                    <i class="fas fa-eye absolute right-3 top-3 text-gray-400 cursor-pointer toggle-password" onclick="togglePassword('registerPassword')"></i>
+                </div>
+            </div>
+            
+            <div class="flex justify-between">
+                <button id="submitRegister" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 en-lang">
+                    Register
+                </button>
+                <button id="submitRegister" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mn-lang hidden">
+                    Бүртгүүлэх
+                </button>
+                
+                <button id="showLogin" class="text-blue-600 hover:text-blue-800 en-lang">
+                    Login
+                </button>
+                <button id="showLogin" class="text-blue-600 hover:text-blue-800 mn-lang hidden">
+                    Нэвтрэх
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-96">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold en-lang">Login</h3>
+                <h3 class="text-xl font-bold mn-lang hidden">Нэвтрэх</h3>
+                <button id="closeLoginModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2 en-lang">Email</label>
+                <label class="block text-gray-700 mb-2 mn-lang hidden">Имэйл</label>
+                <input type="email" id="loginEmail" class="w-full px-3 py-2 border rounded">
+            </div>
+            <div id="loginError" class="hidden text-red-600 mb-4 text-sm"></div>
+            
+            <div class="mb-6">
+                <label class="block text-gray-700 mb-2 en-lang">Password</label>
+                <label class="block text-gray-700 mb-2 mn-lang hidden">Нууц үг</label>
+                <div class="relative">
+                    <input type="password" id="loginPassword" class="w-full px-3 py-2 border rounded">
+                    <i class="fas fa-eye absolute right-3 top-3 text-gray-400 cursor-pointer toggle-password" onclick="togglePassword('loginPassword')"></i>
+                </div>
+            </div>
+            
+            <div class="flex justify-between">
+                <button id="submitLogin" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 en-lang">
+                    Login
+                </button>
+                <button id="submitLogin" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mn-lang hidden">
+                    Нэвтрэх
+                </button>
+                
+                <button id="showRegister" class="text-blue-600 hover:text-blue-800 en-lang">
+                    Register
+                </button>
+                <button id="showRegister" class="text-blue-600 hover:text-blue-800 mn-lang hidden">
+                    Бүртгүүлэх
+                </button>
+            </div>
+        </div>
+    </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Introduction Section -->
+        <section class="mb-12 bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold mb-4 en-lang">IELTS Speaking Test Preparation</h2>
+            <h2 class="text-xl font-bold mb-4 mn-lang hidden">IELTS Ярианы шалгалтанд бэлдэх</h2>
+            
+            <p class="mb-4 text-gray-700 en-lang">
+                Practice for all three parts of the IELTS Speaking test with real exam questions. 
+                Get instant feedback based on IELTS Speaking descriptors and improve your score.
+            </p>
+            <p class="mb-4 text-gray-700 mn-lang hidden">
+                IELTS ярианы шалгалтын гурван хэсгийн бодит асуултуудаар дамжуулан дасгал хийж, 
+                IELTS Speaking descriptors-д тулгуурлан шууд үнэлгээ авч, оноогоо сайжруулна уу.
+            </p>
+            
+            <div class="flex flex-wrap gap-4 mt-6">
+                <button class="part-btn bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition" data-part="1">
+                    <span class="en-lang">Part 1</span>
+                    <span class="mn-lang hidden">1-р хэсэг</span>
+                </button>
+                <button class="part-btn bg-green-600 text-white px-6 py-2 rounded-full font-medium hover:bg-green-700 transition" data-part="2">
+                    <span class="en-lang">Part 2</span>
+                    <span class="mn-lang hidden">2-р хэсэг</span>
+                </button>
+                <button class="part-btn bg-purple-600 text-white px-6 py-2 rounded-full font-medium hover:bg-purple-700 transition" data-part="3">
+                    <span class="en-lang">Part 3</span>
+                    <span class="mn-lang hidden">3-р хэсэг</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Practice Area -->
+        <section id="practiceSection" class="hidden bg-white rounded-lg shadow-md p-6 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="partTitle" class="text-xl font-bold"></h2>
+                <button id="backBtn" class="text-blue-600 hover:text-blue-800 font-medium">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    <span class="en-lang">Back to menu</span>
+                    <span class="mn-lang hidden">Цэс рүү буцах</span>
+                </button>
+            </div>
+
+            <!-- Question Display -->
+            <div id="questionContainer" class="mb-8 p-4 bg-gray-50 rounded-lg">
+                <h3 class="font-semibold mb-2 en-lang">Question:</h3>
+                <h3 class="font-semibold mb-2 mn-lang hidden">Асуулт:</h3>
+                <p id="questionText" class="text-lg"></p>
+                <div id="part2CueCard" class="hidden mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400">
+                    <h4 class="font-semibold mb-2 en-lang">You should say:</h4>
+                    <h4 class="font-semibold mb-2 mn-lang hidden">Та дараах зүйлсийг ярих ёстой:</h4>
+                    <ul id="cuePoints" class="list-disc pl-5"></ul>
+                    <p class="mt-2 en-lang">and explain why this is important to you.</p>
+                    <p class="mt-2 mn-lang hidden">мөн энэ танд яагаад чухал болохыг тайлбарлана уу.</p>
+                </div>
+            </div>
+
+            <!-- Recording Interface -->
+            <div class="mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="font-semibold en-lang">Record your answer:</h3>
+                        <h3 class="font-semibold mn-lang hidden">Хариултаа бичүүлэх:</h3>
+                    </div>
+                    <div id="timer" class="text-gray-600 font-mono">00:00</div>
+                </div>
+                
+                <div class="speaking-indicator mb-4">
+                    <div id="speakingProgress" class="speaking-progress"></div>
+                </div>
+                
+                <div class="flex justify-center space-x-4">
+                    <button id="recordBtn" class="bg-red-600 text-white px-6 py-2 rounded-full font-medium hover:bg-red-700 transition">
+                        <i class="fas fa-microphone mr-2"></i>
+                        <span class="en-lang">Record</span>
+                        <span class="mn-lang hidden">Бичлэг хийх</span>
+                    </button>
+                    <button id="stopBtn" class="bg-gray-600 text-white px-6 py-2 rounded-full font-medium hover:bg-gray-700 transition opacity-50 cursor-not-allowed">
+                        <i class="fas fa-stop mr-2"></i>
+                        <span class="en-lang">Stop</span>
+                        <span class="mn-lang hidden">Зогсоох</span>
+                    </button>
+                    <button id="playBtn" class="bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition opacity-50 cursor-not-allowed">
+                        <i class="fas fa-play mr-2"></i>
+                        <span class="en-lang">Play</span>
+                        <span class="mn-lang hidden">Тоглуулах</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sample Answer (Initially Hidden) -->
+            <div id="sampleAnswerContainer" class="mb-8 hidden">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-semibold en-lang">Sample Answer:</h3>
+                    <h3 class="font-semibold mn-lang hidden">Жишээ хариулт:</h3>
+                    <button id="toggleSampleBtn" class="text-blue-600 hover:text-blue-800">
+                        <span class="en-lang">Hide</span>
+                        <span class="mn-lang hidden">Нуух</span>
+                    </button>
+                </div>
+                <div id="sampleAnswerText" class="p-4 bg-green-50 rounded-lg"></div>
+                <div class="mt-2 text-sm text-gray-500 en-lang">
+                    <i class="fas fa-info-circle mr-1"></i> This is just one possible answer. Your answer can be different.
+                </div>
+                <div class="mt-2 text-sm text-gray-500 mn-lang hidden">
+                    <i class="fas fa-info-circle mr-1"></i> Энэ бол зөвхөн нэг жишээ хариулт юм. Таны хариулт өөр байж болно.
+                </div>
+            </div>
+
+            <!-- Tips Section (Initially Hidden) -->
+            <div id="tipsContainer" class="mb-8 hidden">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-semibold en-lang">Tips for Success:</h3>
+                    <h3 class="font-semibold mn-lang hidden">Амжилтанд хүрэх зөвлөгөө:</h3>
+                    <button id="toggleTipsBtn" class="text-blue-600 hover:text-blue-800">
+                        <span class="en-lang">Hide</span>
+                        <span class="mn-lang hidden">Нуух</span>
+                    </button>
+                </div>
+                <div id="tipsText" class="p-4 bg-purple-50 rounded-lg"></div>
+            </div>
+
+            <!-- Next Question Button -->
+            <div class="flex justify-end">
+                <button id="nextQuestionBtn" class="bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition">
+                    <span class="en-lang">Next Question</span>
+                    <span class="mn-lang hidden">Дараагийн асуулт</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Feedback Section (Initially Hidden) -->
+        <section id="feedbackSection" class="hidden bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4 en-lang">Your Feedback</h2>
+            <h2 class="text-xl font-bold mb-4 mn-lang hidden">Таны үнэлгээ</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Fluency and Coherence -->
+                <div class="p-4 bg-blue-50 rounded-lg">
+                    <h3 class="font-semibold mb-2 text-blue-800 en-lang">Fluency and Coherence</h3>
+                    <h3 class="font-semibold mb-2 text-blue-800 mn-lang hidden">Уян хатан байдал ба логик холбоо</h3>
+                    <div class="flex items-center mb-2">
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div id="fcScore" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <span id="fcScoreText" class="ml-2 text-sm font-medium text-blue-800">0/9</span>
+                    </div>
+                    <p id="fcFeedback" class="text-sm text-gray-700"></p>
+                </div>
+                
+                <!-- Lexical Resource -->
+                <div class="p-4 bg-green-50 rounded-lg">
+                    <h3 class="font-semibold mb-2 text-green-800 en-lang">Lexical Resource</h3>
+                    <h3 class="font-semibold mb-2 text-green-800 mn-lang hidden">Үгийн сан</h3>
+                    <div class="flex items-center mb-2">
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div id="lrScore" class="bg-green-600 h-2.5 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <span id="lrScoreText" class="ml-2 text-sm font-medium text-green-800">0/9</span>
+                    </div>
+                    <p id="lrFeedback" class="text-sm text-gray-700"></p>
+                </div>
+                
+                <!-- Grammatical Range and Accuracy -->
+                <div class="p-4 bg-yellow-50 rounded-lg">
+                    <h3 class="font-semibold mb-2 text-yellow-800 en-lang">Grammatical Range and Accuracy</h3>
+                    <h3 class="font-semibold mb-2 text-yellow-800 mn-lang hidden">Дүрмийн зөв байдал</h3>
+                    <div class="flex items-center mb-2">
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div id="graScore" class="bg-yellow-600 h-2.5 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <span id="graScoreText" class="ml-2 text-sm font-medium text-yellow-800">0/9</span>
+                    </div>
+                    <p id="graFeedback" class="text-sm text-gray-700"></p>
+                </div>
+                
+                <!-- Pronunciation -->
+                <div class="p-4 bg-purple-50 rounded-lg">
+                    <h3 class="font-semibold mb-2 text-purple-800 en-lang">Pronunciation</h3>
+                    <h3 class="font-semibold mb-2 text-purple-800 mn-lang hidden">Дуудлага</h3>
+                    <div class="flex items-center mb-2">
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div id="prScore" class="bg-purple-600 h-2.5 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <span id="prScoreText" class="ml-2 text-sm font-medium text-purple-800">0/9</span>
+                    </div>
+                    <p id="prFeedback" class="text-sm text-gray-700"></p>
+                </div>
+            </div>
+            
+            <!-- Overall Score -->
+            <div class="p-4 bg-gray-50 rounded-lg mb-6">
+                <h3 class="font-semibold mb-2 text-gray-800 en-lang">Overall Band Score</h3>
+                <h3 class="font-semibold mb-2 text-gray-800 mn-lang hidden">Нийт оноо</h3>
+                <div class="flex items-center justify-between">
+                    <div class="text-4xl font-bold text-blue-600" id="overallScore">0.0</div>
+                    <div class="text-sm text-gray-600 en-lang">
+                        Based on IELTS Speaking band descriptors
+                    </div>
+                    <div class="text-sm text-gray-600 mn-lang hidden">
+                        IELTS ярианы шалгалтын үнэлгээний стандартад тулгуурлан
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Improvement Suggestions -->
+            <div class="p-4 bg-red-50 rounded-lg">
+                <h3 class="font-semibold mb-2 text-red-800 en-lang">Areas for Improvement</h3>
+                <h3 class="font-semibold mb-2 text-red-800 mn-lang hidden">Сайжруулах талбарууд</h3>
+                <ul id="improvementList" class="list-disc pl-5 text-sm text-gray-700"></ul>
+            </div>
+            
+            <div class="flex justify-between mt-6">
+                <button id="tryAgainBtn" class="bg-gray-600 text-white px-6 py-2 rounded-full font-medium hover:bg-gray-700 transition">
+                    <span class="en-lang">Try Again</span>
+                    <span class="mn-lang hidden">Дахин оролдох</span>
+                </button>
+                <button id="newQuestionBtn" class="bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition">
+                    <span class="en-lang">New Question</span>
+                    <span class="mn-lang hidden">Шинэ асуулт</span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <h2 class="text-xl font-bold mb-2">IELTS Speaking Practice</h2>
+                    <p class="text-gray-400 text-sm en-lang">For Mongolian students preparing for the IELTS Speaking test</p>
+                    <p class="text-gray-400 text-sm mn-lang hidden">IELTS ярианы шалгалтанд бэлдэж буй Монгол хүүхдүүдэд зориулав</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-6 pt-6 text-sm text-gray-400 text-center">
+                <p class="en-lang">&copy; 2023 IELTS Speaking Practice. All rights reserved.</p>
+                <p class="mn-lang hidden">&copy; 2023 IELTS Ярианы Дасгал. Бүх эрх хуулиар хамгаалагдсан.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Language Toggle
+        document.getElementById('langToggle').addEventListener('click', function() {
+            document.querySelectorAll('.en-lang').forEach(el => el.classList.toggle('hidden'));
+            document.querySelectorAll('.mn-lang').forEach(el => el.classList.toggle('hidden'));
+        });
+
+        // Question Bank
+        const questions = {
+            part1: [
+                {
+                    question: "Do you work or are you a student?",
+                    mnQuestion: "Та ажилтан уу, эсвэл оюутан уу?",
+                    sampleAnswer: "I'm currently a student at the National University of Mongolia. I'm studying computer science, which I find very interesting because it combines logic and creativity. In the future, I hope to become a software developer.",
+                    mnSampleAnswer: "Би одоогоор Монгол Улсын Их Сургуулийн оюутан. Би компьютерийн шинжлэх ухааны чиглэлээр суралцаж байгаа бөгөөд энэ нь логик болон бүтээлч байдлыг хослуулдаг тул надад их сонирхолтой санагддаг. Ирээдүйд би програм хангамж хөгжүүлэгч болохыг хүсч байна.",
+                    tips: "In Part 1, keep your answers concise but complete (2-3 sentences). Speak naturally and don't memorize answers. If you're a student, mention your field of study and why you chose it.",
+                    mnTips: "1-р хэсэгт хариултаа товч боловч бүрэн гүйцэд (2-3 өгүүлбэр) байлга. Байгалийн дагуу ярьж, хариултуудаа цээжлэхгүй байх. Хэрэв та оюутан бол сурч буй мэргэжил, яагаад үүнийг сонгосон талаараа ярих."
+                },
+                {
+                    question: "What do you like about your hometown?",
+                    mnQuestion: "Таны төрсөн нутагт юу таалагддаг вэ?",
+                    sampleAnswer: "I'm from Ulaanbaatar, and what I like most is the vibrant city life combined with our rich cultural heritage. The city has modern amenities but still maintains traditional Mongolian customs. I particularly enjoy the Naadam festival celebrations every summer.",
+                    mnSampleAnswer: "Би Улаанбаатар хотоос гаралтай бөгөөд хамгийн их таалагддаг зүйл нь манай баялаг соёлын өвтэй хосолсон хөгжилтэй хотын амьдрал юм. Хот орчин үеийн тохилог байдалтай боловч уламжлалт Монголын зан үйлийг хадгалсаар байдаг. Би ялангуяа жил бүрийн зун болдог Наадам наадамд дуртай.",
+                    tips: "Mention specific things you like rather than general statements. Include sensory details (what you see, hear, feel) to make your answer more vivid. You can talk about people, places, food, or traditions.",
+                    mnTips: "Ерөнхий мэдэгдэл биш харин тодорхой зүйлсийг дурдаарай. Хариултаа илүү тод болгохын тулд мэдрэмжийн дэлгэрэнгүй мэдээллийг (юу харж, сонсож, мэдэрч байгаагаа) оруулна уу. Та хүмүүс, газрууд, хоол хүнс эсвэл уламжлалуудын тухай ярьж болно."
+                }
+            ],
+            part2: [
+                {
+                    question: "Describe a book you recently read",
+                    mnQuestion: "Саяхан уншсан номын тухай яриарай",
+                    cuePoints: [
+                        "what the book was about",
+                        "when you read it",
+                        "how you felt about it"
+                    ],
+                    mnCuePoints: [
+                        "ном юуны тухай байсан",
+                        "хэзээ уншсан",
+                        "танд яаж санагдсан"
+                    ],
+                    sampleAnswer: "I recently read 'The Alchemist' by Paulo Coelho. It's a philosophical novel about a young shepherd named Santiago who travels from Spain to Egypt in search of a worldly treasure. I read it last month during my summer break. What struck me most was its simple yet profound message about following one's dreams and listening to one's heart. The book made me reflect on my own life journey and the importance of pursuing what truly matters to me. I would highly recommend it to anyone at a crossroads in life.",
+                    mnSampleAnswer: "Би саяхан Пауло Коэльогийн 'Алхимич' номыг уншсан. Энэ бол Испаниас Египет рүү аялж, эрдэнэсийн хайрт хайж явсан Сантьяго гэдэг залуу малчны тухай философийн роман юм. Би үүнийг өнгөрсөн сар зуны амралтын үеэр уншсан. Надад хамгийн их сэтгэгдэл төрүүлсэн зүйл бол хүний мөрөөдлийг дагаж, зүрх сэтгэлээ сонсох тухай энгийн боловч гүн утгатай мессеж байсан. Энэ ном намайг өөрийн амьдралын замнал болон үнэхээр чухал зүйлсийг хүсэн мөрдөх ач холбогдлын талаар бодоход хүргэсэн. Би амьдралын зааг дээр зогссон хүн бүрт үүнийг зөвлөх болно.",
+                    tips: "For Part 2, use the full minute to prepare notes. Structure your answer by addressing each bullet point. Speak for 1-2 minutes without long pauses. Include details that make your story unique and personal.",
+                    mnTips: "2-р хэсэгт бэлтгэх 1 минутыг бүрэн ашиглана уу. Цэг бүрийг дараалан хариултаа зохион байгуул. Удаан түргэлгүй 1-2 минутын турш ярина уу. Өөрийн түүхийг өвөрмөц, хувийн болгодог дэлгэрэнгүй мэдээллийг оруулна уу."
+                }
+            ],
+            part3: [
+                {
+                    question: "How has reading changed in recent years compared to the past?",
+                    mnQuestion: "Унших зүйл сүүлийн жилүүдэд өмнөхтэй харьцуулахад хэрхэн өөрчлөгдсөн бэ?",
+                    sampleAnswer: "Reading habits have changed dramatically with digital technology. In the past, people mainly read printed books, newspapers and magazines. Today, e-books and online articles are increasingly popular due to their convenience and accessibility. Many people now read on smartphones or tablets anywhere, anytime. However, some argue that deep, focused reading has declined with the rise of short-form digital content and constant distractions from notifications.",
+                    mnSampleAnswer: "Унших зуршил дижитал технологийн хөгжлийн хүчээр эрс өөрчлөгдсөн. Өмнө нь хүмүүс голцуо хэвлэмэл ном, сонин, сэтгүүл уншдаг байсан. Өнөөдөр цахим ном, онлайн нийтлэлүүд хүртээмжтэй, тохилог байдлаараа улам бүр алдартай болж байна. Олон хүн одоо гар утас эсвэл таблетаараа хаана ч, хэзээ ч уншиж болно. Гэсэн хэдий ч зарим хүмүүс богино хэлбэрийн цифр контент болон мэдэгдлийн байнгын анхаарлын тархалтын улмаас гүнзгий, төвлөрсөн уншлага буурсан гэж үздэг.",
+                    tips: "In Part 3, develop your answers more fully. Compare past and present, discuss causes and effects, and give examples. Use linking words to organize your thoughts (However, Furthermore, On the other hand). Try to speak for about 30-45 seconds per answer.",
+                    mnTips: "3-р хэсэгт хариултаа илүү бүрэн гүйцэд хөгжүүлнэ үү. Өнгөрсөн болон өнөөгийн зүйлсийг харьцуулж, шалтгаан, үр дагаврын талаар ярьж, жишээ өгнө үү. Санаагаа зохион байгуулахын тулд холбох үгс хэрэглэнэ үү (Гэхдээ, Цаашилбал, Нөгөө талаас). Хариулт бүрийг 30-45 секундын турш ярихыг хичээнэ үү."
+                }
+            ]
+        };
+
+        // DOM Elements
+        const partButtons = document.querySelectorAll('.part-btn');
+        const practiceSection = document.getElementById('practiceSection');
+        const questionContainer = document.getElementById('questionContainer');
+        const questionText = document.getElementById('questionText');
+        const part2CueCard = document.getElementById('part2CueCard');
+        const cuePoints = document.getElementById('cuePoints');
+        const sampleAnswerContainer = document.getElementById('sampleAnswerContainer');
+        const sampleAnswerText = document.getElementById('sampleAnswerText');
+        const tipsContainer = document.getElementById('tipsContainer');
+        const tipsText = document.getElementById('tipsText');
+        const feedbackSection = document.getElementById('feedbackSection');
+        const backBtn = document.getElementById('backBtn');
+        const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+        const tryAgainBtn = document.getElementById('tryAgainBtn');
+        const newQuestionBtn = document.getElementById('newQuestionBtn');
+        const partTitle = document.getElementById('partTitle');
+
+        // Recording Elements
+        const recordBtn = document.getElementById('recordBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const playBtn = document.getElementById('playBtn');
+        const timer = document.getElementById('timer');
+        const speakingProgress = document.getElementById('speakingProgress');
+
+        // Variables
+        let currentPart = '';
+        let currentQuestionIndex = 0;
+        let mediaRecorder;
+        let audioChunks = [];
+        let startTime;
+        let timerInterval;
+        let isRecording = false;
+        let currentAudio = null;
+        
+        // User data and login security
+        let currentUser = null;
+        let userProgress = {
+            part1: {},
+            part2: {},
+            part3: {}
+        };
+        let failedLoginAttempts = 0;
+        let loginLockedUntil = 0;
+
+        // Event Listeners
+        partButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                currentPart = button.dataset.part;
+                currentQuestionIndex = 0;
+                loadQuestion(currentPart, currentQuestionIndex);
+                practiceSection.classList.remove('hidden');
+                document.querySelector('main > section:first-child').classList.add('hidden');
+            });
+        });
+
+        backBtn.addEventListener('click', () => {
+            practiceSection.classList.add('hidden');
+            feedbackSection.classList.add('hidden');
+            document.querySelector('main > section:first-child').classList.remove('hidden');
+            resetRecordingUI();
+        });
+
+        nextQuestionBtn.addEventListener('click', () => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex >= questions['part' + currentPart].length) {
+                currentQuestionIndex = 0; // Loop back to first question
+            }
+            loadQuestion(currentPart, currentQuestionIndex);
+            resetRecordingUI();
+            sampleAnswerContainer.classList.add('hidden');
+            tipsContainer.classList.add('hidden');
+            feedbackSection.classList.add('hidden');
+        });
+
+        tryAgainBtn.addEventListener('click', () => {
+            feedbackSection.classList.add('hidden');
+            resetRecordingUI();
+        });
+
+        newQuestionBtn.addEventListener('click', () => {
+            feedbackSection.classList.add('hidden');
+            currentQuestionIndex++;
+            if (currentQuestionIndex >= questions['part' + currentPart].length) {
+                currentQuestionIndex = 0; // Loop back to first question
+            }
+            loadQuestion(currentPart, currentQuestionIndex);
+            resetRecordingUI();
+        });
+
+        // Toggle Sample Answer
+        document.getElementById('toggleSampleBtn').addEventListener('click', function() {
+            sampleAnswerContainer.classList.toggle('hidden');
+            this.querySelector('.en-lang').textContent = sampleAnswerContainer.classList.contains('hidden') ? 'Show' : 'Hide';
+            this.querySelector('.mn-lang').textContent = sampleAnswerContainer.classList.contains('hidden') ? 'Харуулах' : 'Нуух';
+        });
+
+        // Toggle Tips
+        document.getElementById('toggleTipsBtn').addEventListener('click', function() {
+            tipsContainer.classList.toggle('hidden');
+            this.querySelector('.en-lang').textContent = tipsContainer.classList.contains('hidden') ? 'Show' : 'Hide';
+            this.querySelector('.mn-lang').textContent = tipsContainer.classList.contains('hidden') ? 'Харуулах' : 'Нуух';
+        });
+
+        // Recording Functions
+        recordBtn.addEventListener('click', startRecording);
+        stopBtn.addEventListener('click', stopRecording);
+        playBtn.addEventListener('click', playRecording);
+
+        function startRecording() {
+            if (isRecording) return;
+            
+            // Reset previous recording
+            audioChunks = [];
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    isRecording = true;
+                    mediaRecorder = new MediaRecorder(stream);
+                    
+                    mediaRecorder.ondataavailable = event => {
+                        audioChunks.push(event.data);
+                    };
+                    
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        currentAudio = new Audio(URL.createObjectURL(audioBlob));
+                        analyzeRecording();
+                    };
+                    
+                    mediaRecorder.start();
+                    startTime = Date.now();
+                    timerInterval = setInterval(updateTimer, 100);
+                    
+                    // Update UI
+                    recordBtn.disabled = true;
+                    recordBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    stopBtn.disabled = false;
+                    stopBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    playBtn.disabled = true;
+                    playBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    
+                    // Visual feedback
+                    speakingProgress.style.width = '0%';
+                    let progress = 0;
+                    const progressInterval = setInterval(() => {
+                        if (!isRecording) {
+                            clearInterval(progressInterval);
+                            return;
+                        }
+                        progress = Math.min(progress + Math.random() * 2, 100);
+                        speakingProgress.style.width = `${progress}%`;
+                    }, 100);
+                })
+                .catch(err => {
+                    console.error('Error accessing microphone:', err);
+                    alert('Microphone access was denied. Please allow microphone access to use this feature.');
+                });
+        }
+
+        function stopRecording() {
+            if (!isRecording) return;
+            
+            clearInterval(timerInterval);
+            mediaRecorder.stop();
+            isRecording = false;
+            
+            // Stop all tracks
+            mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            
+            // Update UI
+            recordBtn.disabled = false;
+            recordBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            stopBtn.disabled = true;
+            stopBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            playBtn.disabled = false;
+            playBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        function playRecording() {
+            if (!currentAudio) return;
+            
+            currentAudio.currentTime = 0;
+            currentAudio.play();
+        }
+
+        function updateTimer() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+            const seconds = (elapsed % 60).toString().padStart(2, '0');
+            timer.textContent = `${minutes}:${seconds}`;
+        }
+
+        function resetRecordingUI() {
+            clearInterval(timerInterval);
+            timer.textContent = '00:00';
+            speakingProgress.style.width = '0%';
+            
+            recordBtn.disabled = false;
+            recordBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            stopBtn.disabled = true;
+            stopBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            playBtn.disabled = true;
+            playBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            
+            isRecording = false;
+            currentAudio = null;
+            audioChunks = [];
+        }
+
+        // Question Loading
+        function loadQuestion(part, index) {
+            const partQuestions = questions['part' + part];
+            const question = partQuestions[index];
+            
+            // Set part title
+            if (document.querySelector('.en-lang').classList.contains('hidden')) {
+                partTitle.textContent = `${part}-р хэсэг`;
+            } else {
+                partTitle.textContent = `Part ${part}`;
+            }
+            
+            // Set question text
+            if (document.querySelector('.en-lang').classList.contains('hidden')) {
+                questionText.textContent = question.mnQuestion || question.question;
+            } else {
+                questionText.textContent = question.question;
+            }
+            
+            // Handle Part 2 cue card
+            if (part === '2') {
+                part2CueCard.classList.remove('hidden');
+                cuePoints.innerHTML = '';
+                
+                const points = question.mnCuePoints || question.cuePoints;
+                points.forEach(point => {
+                    const li = document.createElement('li');
+                    li.textContent = point;
+                    cuePoints.appendChild(li);
+                });
+            } else {
+                part2CueCard.classList.add('hidden');
+            }
+            
+            // Set sample answer
+            if (document.querySelector('.en-lang').classList.contains('hidden')) {
+                sampleAnswerText.textContent = question.mnSampleAnswer || question.sampleAnswer;
+            } else {
+                sampleAnswerText.textContent = question.sampleAnswer;
+            }
+            
+            // Set tips
+            if (document.querySelector('.en-lang').classList.contains('hidden')) {
+                tipsText.textContent = question.mnTips || question.tips;
+            } else {
+                tipsText.textContent = question.tips;
+            }
+            
+            // Show sample answer and tips containers
+            sampleAnswerContainer.classList.remove('hidden');
+            tipsContainer.classList.remove('hidden');
+        }
+
+        // Analysis and Feedback (simulated)
+        function analyzeRecording() {
+            // Simulate analysis delay
+            setTimeout(() => {
+                // Generate random scores (in real app, this would come from analysis)
+                const fcScore = Math.min(9, Math.floor(Math.random() * 5) + 5); // Fluency and Coherence
+                const lrScore = Math.min(9, Math.floor(Math.random() * 5) + 4); // Lexical Resource
+                const graScore = Math.min(9, Math.floor(Math.random() * 5) + 4); // Grammatical Range and Accuracy
+                const prScore = Math.min(9, Math.floor(Math.random() * 5) + 4); // Pronunciation
+                const overallScore = ((fcScore + lrScore + graScore + prScore) / 4).toFixed(1);
+                
+                // Set scores in UI
+                document.getElementById('fcScore').style.width = `${(fcScore / 9) * 100}%`;
+                document.getElementById('lrScore').style.width = `${(lrScore / 9) * 100}%`;
+                document.getElementById('graScore').style.width = `${(graScore / 9) * 100}%`;
+                document.getElementById('prScore').style.width = `${(prScore / 9) * 100}%`;
+                
+                document.getElementById('fcScoreText').textContent = `${fcScore}/9`;
+                document.getElementById('lrScoreText').textContent = `${lrScore}/9`;
+                document.getElementById('graScoreText').textContent = `${graScore}/9`;
+                document.getElementById('prScoreText').textContent = `${prScore}/9`;
+                
+                document.getElementById('overallScore').textContent = overallScore;
+                
+                // Set feedback text
+                if (document.querySelector('.en-lang').classList.contains('hidden')) {
+                    // Mongolian feedback
+                    document.getElementById('fcFeedback').textContent = getMongolianFeedback('fc', fcScore);
+                    document.getElementById('lrFeedback').textContent = getMongolianFeedback('lr', lrScore);
+                    document.getElementById('graFeedback').textContent = getMongolianFeedback('gra', graScore);
+                    document.getElementById('prFeedback').textContent = getMongolianFeedback('pr', prScore);
+                    
+                    // Improvement suggestions
+                    const improvementList = document.getElementById('improvementList');
+                    improvementList.innerHTML = '';
+                    const improvements = getMongolianImprovements(fcScore, lrScore, graScore, prScore);
+                    improvements.forEach(improvement => {
+                        const li = document.createElement('li');
+                        li.textContent = improvement;
+                        improvementList.appendChild(li);
+                    });
+                } else {
+                    // English feedback
+                    document.getElementById('fcFeedback').textContent = getEnglishFeedback('fc', fcScore);
+                    document.getElementById('lrFeedback').textContent = getEnglishFeedback('lr', lrScore);
+                    document.getElementById('graFeedback').textContent = getEnglishFeedback('gra', graScore);
+                    document.getElementById('prFeedback').textContent = getEnglishFeedback('pr', prScore);
+                    
+                    // Improvement suggestions
+                    const improvementList = document.getElementById('improvementList');
+                    improvementList.innerHTML = '';
+                    const improvements = getEnglishImprovements(fcScore, lrScore, graScore, prScore);
+                    improvements.forEach(improvement => {
+                        const li = document.createElement('li');
+                        li.textContent = improvement;
+                        improvementList.appendChild(li);
+                    });
+                }
+                
+                // Show feedback section
+                feedbackSection.classList.remove('hidden');
+                feedbackSection.scrollIntoView({ behavior: 'smooth' });
+                
+            }, 2000); // Simulate 2 second analysis time
+        }
+
+        // Feedback generators
+        function getEnglishFeedback(category, score) {
+            const feedbacks = {
+                fc: [
+                    "You frequently hesitate and repeat yourself. Try to speak more smoothly without long pauses.",
+                    "You sometimes hesitate but can maintain basic coherence. Work on linking ideas more clearly.",
+                    "Your speech is generally fluent with occasional hesitation. Try to use more linking words.",
+                    "You speak fluently with only rare hesitation. Ideas are well-connected and logical.",
+                    "Your speech is very fluent and coherent with effective use of discourse markers."
+                ],
+                lr: [
+                    "Your vocabulary is very limited. Try to learn and use more topic-specific words.",
+                    "You use basic vocabulary adequately but need more variety. Practice paraphrasing.",
+                    "You have a good range of vocabulary but sometimes use words incorrectly.",
+                    "You use a wide range of vocabulary appropriately with only occasional inaccuracies.",
+                    "You use a wide range of vocabulary flexibly and precisely in all topics."
+                ],
+                gra: [
+                    "You make frequent grammatical errors that affect understanding. Focus on basic tenses.",
+                    "You make noticeable errors in basic grammar. Practice simple and continuous tenses.",
+                    "You make some errors but generally control grammar well. Work on complex structures.",
+                    "You make very few errors and use a range of structures appropriately.",
+                    "You use a full range of structures naturally and accurately with rare minor errors."
+                ],
+                pr: [
+                    "Your pronunciation is often hard to understand. Focus on individual sounds first.",
+                    "Some words are hard to understand. Work on word stress and intonation patterns.",
+                    "Your pronunciation is generally clear though with some noticeable accent features.",
+                    "Your pronunciation is very clear with only occasional lapses in stress or intonation.",
+                    "Your pronunciation is easy to understand with effective use of phonological features."
+                ]
+            };
+            
+            return feedbacks[category][Math.floor(score / 2)];
+        }
+
+        function getMongolianFeedback(category, score) {
+            const feedbacks = {
+                fc: [
+                    "Та байнга түргэлж, давтагдана. Удаан түргэлгүй илүү жигд ярихыг хичээнэ үү.",
+                    "Та заримдаа түргэлж байгаа ч үндсэн логик холбоог хадгалж чаддаг. Санаагаа илүү тод холбохыг оролдоно уу.",
+                    "Таны яриа ерөнхийдөө уян хатан бөгөөд заримдаа л түргэлж байдаг. Илүү олон холбох үг хэрэглэхийг оролдоно уу.",
+                    "Та маш ховор тохиолдолд л түргэлж, санаануудаа сайн холбож, логикоор ярьдаг.",
+                    "Таны яриа маш уян хатан, логиктой бөгөөд ярианы тэмдэглэгээг үр дүнтэй ашигладаг."
+                ],
+                lr: [
+                    "Таны үгийн сан маш хязгаарлагдмал. Илүү олон сэдэвтэй холбоотой үгсийг сурч, хэрэглэхийг хичээнэ үү.",
+                    "Та үндсэн үгийн санг хангалттай хэрэглэдэг ч илүү олон янз байх ёстой. Өөр үгээр дахин хэлэх дасгал хийх.",
+                    "Та үгийн сангийн хүрээг сайн эзэмшсэн боловч заримдаа үгсийг буруу хэрэглэдэг.",
+                    "Та өргөн хүрээний үгийн санг зөв хэрэглэдэг бөгөөд зөвхөн үе үе буруу хэрэглэдэг.",
+                    "Та бүх сэдэвт өргөн хүрээний үгийн сангийг уян хатан, үнэн зөв хэрэглэдэг."
+                ],
+                gra: [
+                    "Та ойлголтыг хүндрүүлдэг дүрмийн алдаануудыг байнга хийдэг. Үндсэн цаг хугацаанд анхаарлаа төвлөрүүлнэ үү.",
+                    "Та үндсэн дүрэмд анзаарагдах алдаануудыг хийдэг. Энгийн ба тасралтгүй цагийн хэлбэрүүдээр дасгал хийх.",
+                    "Та зарим алдаа гаргадаг боловч ерөнхийдөө дүрмийг сайн хянадаг. Цогц бүтэц дээр ажиллах.",
+                    "Та маш цөөхөн алдаа гаргадаг бөгөөд олон төрлийн бүтцийг зохих ёсоор хэрэглэдэг.",
+                    "Та бүх төрлийн бүтцийг байгалийн дагуу, үнэн зөв хэрэглэдэг бөгөөд маш ховор тохиолдолд жижиг алдаа гаргадаг."
+                ],
+                pr: [
+                    "Таны дуудлага ихэвчлэн ойлгоход хэцүү байдаг. Эхлээд тусдаа дууны дасгал хийх.",
+                    "Зарим үгсийг ойлгоход хэцүү байдаг. Үгийн даралт, өндөрлөх хэв маяг дээр ажиллах.",
+                    "Таны дуудлага ерөнхийдөө тодорхой боловч зарим нэг ярианы онцлог шинж тэмдэг ажиглагддаг.",
+                    "Таны дуудлага маш тодорхой бөгөөд зөвхөн үе үе даралт эсвэл өндөрлөлт алдагдах тохиолдол гардаг.",
+                    "Таны дуудлага ойлгоход хялбар бөгөөд дууны шинж чанарыг үр дүнтэй ашигладаг."
+                ]
+            };
+            
+            return feedbacks[category][Math.floor(score / 2)];
+        }
+
+        function getEnglishImprovements(fc, lr, gra, pr) {
+            const improvements = [];
+            
+            if (fc < 6) improvements.push("Practice speaking for 1-2 minutes without stopping on random topics");
+            if (lr < 6) improvements.push("Learn 5 new topic-related words each day and use them in sentences");
+            if (gra < 6) improvements.push("Review basic tenses and practice forming complex sentences");
+            if (pr < 6) improvements.push("Watch English videos and repeat after native speakers");
+            
+            if (improvements.length === 0) {
+                improvements.push("Keep practicing! Try to extend your answers with more details and examples");
+            }
+            
+            return improvements;
+        }
+
+        function getMongolianImprovements(fc, lr, gra, pr) {
+            const improvements = [];
+            
+            if (fc < 6) improvements.push("Санамсаргүй сэдвүүд дээр 1-2 минутын турш зогсохгүй ярих дасгал хийх");
+            if (lr < 6) improvements.push("Өдөр бүр 5 шинэ сэдэвтэй холбоотой үг сурч, өгүүлбэрт хэрэглэх");
+            if (gra < 6) improvements.push("Үндсэн цаг хугацааг шалгаж, цогц өгүүлбэр бүтээх дасгал хийх");
+            if (pr < 6) improvements.push("Англи хэлний видеог үзээд, төрөлх хэлтнүүдийн дараа давтах");
+            
+            if (improvements.length === 0) {
+                improvements.push("Дадлагаа үргэлжлүүлээрэй! Хариултаа илүү дэлгэрэнгүй мэдээлэл, жишээгээр сунгахыг оролдоно уу");
+            }
+            
+            return improvements;
+        }
+
+        // Modal toggle functionality
+        document.getElementById('showRegister').addEventListener('click', function() {
+            document.getElementById('loginModal').classList.add('hidden');
+            document.getElementById('registerModal').classList.remove('hidden');
+        });
+
+        document.getElementById('showLogin').addEventListener('click', function() {
+            document.getElementById('registerModal').classList.add('hidden');
+            document.getElementById('loginModal').classList.remove('hidden');
+        });
+
+        document.getElementById('closeRegisterModal').addEventListener('click', function() {
+            document.getElementById('registerModal').classList.add('hidden');
+        });
+
+        // Password visibility toggle
+        function togglePassword(id) {
+            const input = document.getElementById(id);
+            const icon = input.nextElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        // Register functionality
+        document.getElementById('submitRegister').addEventListener('click', function() {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            if (name && email && password) {
+                // In a real app, this would call a backend API
+                currentUser = {
+                    name: name,
+                    email: email
+                };
+                
+                // Initialize empty progress
+                userProgress = {
+                    part1: {},
+                    part2: {},
+                    part3: {}
+                };
+                
+                // Save to localStorage (simulated)
+                localStorage.setItem(`ieltsProgress_${email}`, JSON.stringify(userProgress));
+                localStorage.setItem(`ieltsUser_${email}`, JSON.stringify(currentUser));
+                
+                document.getElementById('registerModal').classList.add('hidden');
+                updateUserUI();
+            }
+        });
+
+        // Login functionality
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            document.getElementById('loginModal').classList.remove('hidden');
+        });
+
+        document.getElementById('closeLoginModal').addEventListener('click', function() {
+            document.getElementById('loginModal').classList.add('hidden');
+        });
+
+        document.getElementById('submitLogin').addEventListener('click', function() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorElement = document.getElementById('loginError');
+            
+            if (!email || !password) {
+                if (document.querySelector('.en-lang').classList.contains('hidden')) {
+                    errorElement.textContent = "Имэйл болон нууц үгээ оруулна уу";
+                } else {
+                    errorElement.textContent = "Please enter both email and password";
+                }
+                errorElement.classList.remove('hidden');
+                return;
+            }
+            
+            // In a real app, this would call a backend API
+            // For demo, we'll check if password has at least 6 chars
+            if (password.length < 6) {
+                if (document.querySelector('.en-lang').classList.contains('hidden')) {
+                    errorElement.textContent = "Нууц үг хамгийн багадаа 6 тэмдэгт байх ёстой";
+                } else {
+                    errorElement.textContent = "Password must be at least 6 characters";
+                }
+                errorElement.classList.remove('hidden');
+                return;
+            }
+
+            // Simulate successful login
+            currentUser = {
+                email: email,
+                name: email.split('@')[0]
+            };
+            
+            // Load user progress from localStorage (simulated)
+            const savedProgress = localStorage.getItem(`ieltsProgress_${email}`);
+            if (savedProgress) {
+                userProgress = JSON.parse(savedProgress);
+            }
+            
+            document.getElementById('loginModal').classList.add('hidden');
+            updateUserUI();
+        });
+
+        function updateUserUI() {
+            if (currentUser) {
+                document.getElementById('loginBtn').innerHTML = `
+                    <i class="fas fa-user-circle mr-2"></i>
+                    <span>${currentUser.name}</span>
+                `;
+            }
+        }
+
+        // Save progress when recording is analyzed
+        function saveUserProgress(part, questionIndex, score) {
+            if (!currentUser) return;
+            
+            if (!userProgress[part]) {
+                userProgress[part] = {};
+            }
+            
+            userProgress[part][`q${questionIndex}`] = {
+                score: score,
+                date: new Date().toISOString()
+            };
+            
+            // Save to localStorage (simulated)
+            localStorage.setItem(`ieltsProgress_${currentUser.email}`, JSON.stringify(userProgress));
+        }
+
+        // Update analyzeRecording function to save progress
+        function analyzeRecording() {
+            // Simulate analysis delay
+            setTimeout(() => {
+                // ... existing score generation code ...
+
+                // Save progress if user is logged in
+                if (currentUser) {
+                    saveUserProgress('part' + currentPart, currentQuestionIndex, overallScore);
+                }
+
+                // Show feedback section
+                feedbackSection.classList.remove('hidden');
+                feedbackSection.scrollIntoView({ behavior: 'smooth' });
+                
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
